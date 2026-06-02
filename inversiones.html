@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inversiones Inmobiliarias</title>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--blue:#185FA5;--blue-l:#E6F1FB;--blue-m:#378ADD;--green:#3B6D11;--green-l:#EAF3DE;--red:#A32D2D;--red-l:#FCEBEB;--amber-l:#FAEEDA;--amber:#854F0B;--gray-l:#F1EFE8;--gray:#5F5E5A;--r:8px;--rl:12px;--border:0.5px solid #e0ddd6}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:13px;color:#1a1a18;background:#f8f7f4;min-height:100vh}
+.wrap{max-width:1280px;margin:0 auto;padding:1rem 1.5rem}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;gap:.5rem;flex-wrap:wrap}
+.app-title{font-size:18px;font-weight:600;display:flex;align-items:center;gap:8px;color:#1a1a18}
+.app-sub{font-size:11px;color:#888780;margin-top:2px}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:.32rem .75rem;border-radius:var(--r);border:var(--border);background:#fff;color:#1a1a18;cursor:pointer;font-size:12px;font-weight:500;line-height:1.4;transition:background .12s}
+.btn:hover{background:#f1efe8}
+.btn-primary{background:var(--blue);color:#fff;border-color:var(--blue)}
+.btn-primary:hover{background:#0C447C}
+.btn-danger{background:var(--red-l);color:var(--red);border-color:#f7c1c1}
+.btn-sm{padding:.18rem .45rem;font-size:11px}
+.btn-tog{background:#f1efe8;border-color:#d3d1c7}
+.btn-tog.on{background:var(--blue-l);color:#0C447C;border-color:#85B7EB}
+
+/* Auth overlay */
+#auth-screen{position:fixed;inset:0;background:#f8f7f4;display:flex;align-items:center;justify-content:center;z-index:1000}
+.auth-card{background:#fff;border:var(--border);border-radius:var(--rl);padding:2.5rem 2rem;text-align:center;max-width:360px;width:100%}
+.auth-logo{font-size:32px;margin-bottom:1rem}
+.auth-title{font-size:17px;font-weight:600;margin-bottom:.4rem}
+.auth-sub{font-size:12px;color:#888780;margin-bottom:1.5rem;line-height:1.5}
+.auth-error{font-size:12px;color:var(--red);margin-top:.75rem;padding:.4rem .6rem;background:var(--red-l);border-radius:var(--r);display:none}
+
+/* Loading */
+#loading{position:fixed;inset:0;background:rgba(248,247,244,.85);display:flex;align-items:center;justify-content:center;z-index:500;display:none}
+.spinner{width:28px;height:28px;border:2.5px solid #d3d1c7;border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* KPIs */
+.kpi-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:.85rem}
+.kpi{background:#fff;border:var(--border);border-radius:var(--r);padding:.6rem .85rem;cursor:pointer;transition:border-color .12s}
+.kpi:hover{border-color:#b4b2a9}
+.kpi.on{border-color:var(--blue-m)}
+.kpi-label{font-size:10px;color:#888780;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+.kpi-val{font-size:20px;font-weight:600;line-height:1}
+.kpi-sub{font-size:10px;color:#b4b2a9;margin-top:3px}
+
+/* Charts */
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:.85rem}
+.chart-card{background:#fff;border:var(--border);border-radius:var(--rl);padding:.75rem}
+.chart-label{font-size:10px;font-weight:600;color:#888780;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.5rem}
+
+/* Toolbar */
+.toolbar{display:flex;align-items:center;gap:.4rem;margin-bottom:.5rem;flex-wrap:wrap}
+.search-box{position:relative;flex:1;min-width:160px}
+.search-box input{width:100%;padding:.3rem .5rem .3rem 1.8rem;border-radius:var(--r);border:var(--border);background:#fff;color:#1a1a18;font-size:12px}
+.search-box svg{position:absolute;left:.45rem;top:50%;transform:translateY(-50%);pointer-events:none;opacity:.4}
+.chip{display:inline-flex;align-items:center;gap:3px;padding:.15rem .45rem;border-radius:99px;font-size:11px;background:var(--blue-l);color:#0C447C;border:0.5px solid #B5D4F4}
+.chip .x{cursor:pointer;margin-left:1px}
+.view-toggle{display:flex;border:var(--border);border-radius:var(--r);overflow:hidden}
+.vbtn{padding:.28rem .65rem;font-size:11px;font-weight:500;cursor:pointer;border:none;background:#fff;color:#888780;transition:background .1s}
+.vbtn:not(:last-child){border-right:var(--border)}
+.vbtn.on{background:var(--blue);color:#fff}
+.vbtn:hover:not(.on){background:#f1efe8}
+.rcount{font-size:11px;color:#b4b2a9;white-space:nowrap}
+
+/* Table */
+.tbl-outer{background:#fff;border:var(--border);border-radius:var(--rl);overflow:hidden}
+table{width:100%;border-collapse:collapse;table-layout:fixed}
+thead{background:#f8f7f4}
+th{padding:0;border-bottom:var(--border);font-weight:600;font-size:11px;color:#888780;white-space:nowrap;position:relative}
+.th-btn{display:flex;align-items:center;width:100%;padding:.4rem .5rem;cursor:pointer;gap:2px;background:none;border:none;color:inherit;font:inherit;text-align:left;transition:background .1s}
+.th-btn:hover{background:#f1efe8;color:#1a1a18}
+.th-btn.sorted{color:var(--blue)}
+.th-sort{font-size:9px;opacity:.4;flex-shrink:0;margin-left:auto}
+.th-btn.sorted .th-sort{opacity:1}
+.th-num .th-btn{flex-direction:row-reverse}
+td{padding:.35rem .5rem;border-bottom:var(--border);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#1a1a18}
+tr:last-child td{border-bottom:none}
+tr[data-id]:hover td{background:#f8f7f4;cursor:pointer}
+.td-r{text-align:right;font-variant-numeric:tabular-nums}
+.badge{display:inline-block;padding:1px 6px;border-radius:99px;font-size:10px;font-weight:600}
+.ba{background:#E6F1FB;color:#0C447C}.bi{background:#EAF3DE;color:#27500A}
+.bc{background:#FAEEDA;color:#633806}.bd{background:#f1efe8;color:#5F5E5A}
+.bce{background:#EAF3DE;color:#085041}.bp{background:#FAEEDA;color:#854F0B}
+.rp{color:var(--green);font-weight:600}.rn{color:var(--red);font-weight:600}
+.tbl-empty{text-align:center;padding:2.5rem;color:#b4b2a9;font-size:12px}
+
+/* Dropdown filtro */
+.dd{position:absolute;top:100%;left:0;z-index:300;background:#fff;border:var(--border);border-radius:var(--rl);min-width:190px;max-width:230px;padding:.35rem 0;box-shadow:0 8px 24px rgba(0,0,0,.1)}
+.dd-search{padding:.25rem .4rem;border-bottom:var(--border);margin-bottom:.2rem}
+.dd-search input{width:100%;padding:.22rem .4rem;border-radius:5px;border:var(--border);font-size:11px;background:#fff;color:#1a1a18}
+.dd-list{max-height:180px;overflow-y:auto;padding:0 .25rem}
+.dd-row{display:flex;align-items:center;gap:.35rem;padding:.26rem .35rem;border-radius:5px;cursor:pointer;font-size:11px}
+.dd-row:hover{background:#f8f7f4}
+.dd-row input[type=checkbox]{accent-color:var(--blue);cursor:pointer;width:12px;height:12px;flex-shrink:0}
+.dd-foot{padding:.3rem .4rem 0;border-top:var(--border);margin-top:.2rem;display:flex;gap:.3rem;justify-content:flex-end}
+
+/* Pager */
+.pager{display:flex;align-items:center;justify-content:flex-end;gap:.3rem;margin-top:.5rem}
+.pager span{font-size:11px;color:#b4b2a9}
+.pg{padding:.2rem .45rem;border-radius:5px;border:var(--border);background:#fff;cursor:pointer;font-size:11px}
+.pg.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+.pg:hover:not(.on){background:#f1efe8}
+
+/* Form & detail */
+.page-wrap{background:#fff;border:var(--border);border-radius:var(--rl);padding:1.1rem}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:.55rem}
+.ff{grid-column:1/-1}
+.fl{display:block;font-size:10px;font-weight:600;color:#888780;margin-bottom:3px;text-transform:uppercase;letter-spacing:.04em}
+.fi input,.fi select,.fi textarea{width:100%;padding:.32rem .5rem;border-radius:var(--r);border:var(--border);background:#fff;color:#1a1a18;font-size:12px}
+.fi input:focus,.fi select:focus,.fi textarea:focus{outline:none;border-color:var(--blue-m)}
+.fi textarea{resize:vertical;min-height:54px}
+.fdiv{grid-column:1/-1;font-size:10px;font-weight:600;color:#b4b2a9;text-transform:uppercase;letter-spacing:.06em;padding:.3rem 0 .2rem;border-bottom:var(--border);margin-top:.25rem}
+.fcalc{font-size:12px;color:#888780;padding:.32rem .5rem;background:#f8f7f4;border-radius:var(--r);border:var(--border)}
+.det-grid{display:grid;grid-template-columns:1fr 1fr;gap:.45rem}
+.det-row label{font-size:10px;color:#b4b2a9;text-transform:uppercase;letter-spacing:.04em;display:block}
+.det-row p{font-size:12px;margin-top:1px}
+.det-sec{font-size:10px;font-weight:600;color:#b4b2a9;text-transform:uppercase;letter-spacing:.06em;padding:.35rem 0 .15rem;border-bottom:var(--border);grid-column:1/-1;margin-top:.2rem}
+.cfg-sec{margin-bottom:1rem}
+.cfg-title{font-size:12px;font-weight:600;margin-bottom:.4rem}
+.cfg-items{display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:.4rem}
+.cfg-item{display:inline-flex;align-items:center;gap:.25rem;padding:.18rem .5rem;border-radius:99px;font-size:11px;border:var(--border);background:#fff}
+.cfg-item.off{opacity:.4;text-decoration:line-through}
+.cfg-item button{background:none;border:none;cursor:pointer;font-size:11px;color:#b4b2a9;padding:0;line-height:1}
+.cfg-item button:hover{color:var(--red)}
+.add-row{display:flex;gap:.3rem;margin-top:.3rem}
+.add-row input{flex:1;padding:.28rem .5rem;border-radius:var(--r);border:var(--border);font-size:12px;background:#fff;color:#1a1a18}
+.sync-bar{font-size:11px;color:#888780;padding:.3rem .6rem;background:#f8f7f4;border-radius:var(--r);border:var(--border);display:flex;align-items:center;gap:.4rem}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:#97C459;flex-shrink:0}
+.sync-dot.err{background:#E24B4A}
+.sync-dot.sync{background:#EF9F27;animation:pulse .8s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+</style>
+</head>
+<body>
+
+<!-- Auth screen -->
+<div id="auth-screen">
+  <div class="auth-card">
+    <div class="auth-logo">🏢</div>
+    <div class="auth-title">Inversiones Inmobiliarias</div>
+    <div class="auth-sub">Iniciá sesión con tu cuenta de Google para acceder a la base de datos compartida.</div>
+    <div id="g-signin-btn"></div>
+    <div class="auth-error" id="auth-err">No tenés acceso a esta app. Pedile al administrador que agregue tu email como usuario de prueba en Google Cloud Console.</div>
+  </div>
+</div>
+
+<!-- Loading -->
+<div id="loading"><div class="spinner"></div></div>
+
+<!-- Main app -->
+<div class="wrap" id="main-app" style="display:none">
+  <div id="app"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+// ─── CONFIG ───────────────────────────────────────────────────────────────
+const CLIENT_ID = '260411653116-e0li9118s6dq2kfksj6v5fsrt6sd5cv8.apps.googleusercontent.com';
+const SHEET_ID  = '1cU_Gd3J9Q32dDi_jfY9AbqNcNav7iYaaLxn-P2cbNNQ';
+const SHEET_TAB = 'Proyectos';
+const SCOPES    = 'https://www.googleapis.com/auth/spreadsheets';
+
+// ─── LISTS ────────────────────────────────────────────────────────────────
+const L={
+  tipo:['En pozo','En construcción','Llave en mano','Construido','Refacción','Lote'],
+  estado:['En análisis','Pendiente info','Interesado','Descartado','Comprometido','Cerrado'],
+  destino:['Vivienda propia','Renta','Reventa','A definir'],
+  moneda:['USD','ARS','Mixto'],
+  ajuste:['Precio fijo','Indexado CAC','Indexado inflación','A confirmar','Libre'],
+  pago:['Contado','Cuotas en pesos','Cuotas en USD','Mixto','A convenir'],
+  estructura:['Fideicomiso al costo','Fideicomiso inmobiliario','Escritura directa','Boleto','A confirmar'],
+  provincia:['Buenos Aires','CABA','Córdoba','Santa Fe','Mendoza','Otro']
+};
+const DIS={tipo:new Set(),estado:new Set(),destino:new Set(),moneda:new Set(),ajuste:new Set(),pago:new Set(),estructura:new Set(),provincia:new Set()};
+
+// ─── HEADERS (must match Sheet column order) ──────────────────────────────
+const HEADERS=['id','proyecto','desarrollador','contacto','tel','estado','fechaConsulta','fechaFin','fechaReal','tipo','destino','m2cub','m2semi','m2desc','factor','moneda','ajuste','costoTotal','precioVenta','formaPago','estructura','web','provincia','barrio','direccion','docOK','obs'];
+
+// ─── STATE ────────────────────────────────────────────────────────────────
+let accessToken=null, projects=[], syncStatus='ok';
+let sortCol='proyecto',sortDir=1,q='',kpiFilt=null,page=1,view='summary',openDD=null;
+const PER=15;
+let CF={},PF={};
+
+// ─── HELPERS ─────────────────────────────────────────────────────────────
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2);
+const hom=p=>(+p.m2cub||0)+(+p.m2semi||0)*((+p.factor)||.5);
+const cm2=p=>{const h=hom(p);return h>0?(+p.costoTotal||0)/h:0};
+const ren=p=>{const c=+p.costoTotal||0,v=+p.precioVenta||0;return c>0?(v-c)/c:0};
+const fnum=n=>(n||n===0)?Math.round(n).toLocaleString('es-AR'):'-';
+const fpct=n=>n?(n*100).toFixed(1)+'%':'-';
+const fmoney=(n,mon,compact)=>{
+  if(!n&&n!==0)return '-';
+  const v=Math.round(n);
+  if(compact&&mon==='ARS'){
+    if(v>=1000000)return '$'+(v/1000000).toFixed(1).replace(/\.0$/,'')+'M';
+    if(v>=1000)return '$'+Math.round(v/1000)+'k';
+  }
+  return '$'+v.toLocaleString('es-AR');
+};
+const fcm2=(n)=>n?'$'+Math.round(n).toLocaleString('es-AR'):'-';
+const bmap={'En análisis':'ba','Interesado':'bi','Comprometido':'bc','Descartado':'bd','Cerrado':'bce','Pendiente info':'bp'};
+const showLoad=v=>document.getElementById('loading').style.display=v?'flex':'none';
+
+// ─── SHEET API ────────────────────────────────────────────────────────────
+const sheetsBase=`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}`;
+const authH=()=>({'Authorization':'Bearer '+accessToken,'Content-Type':'application/json'});
+
+async function sheetRead(){
+  const r=await fetch(`${sheetsBase}/values/${SHEET_TAB}!A1:AA`,{headers:authH()});
+  if(!r.ok)throw new Error('read '+r.status);
+  const d=await r.json();
+  const rows=d.values||[];
+  if(rows.length<2)return[];
+  const hdrs=rows[0];
+  return rows.slice(1).filter(r=>r[0]).map(r=>{
+    const o={};
+    HEADERS.forEach((h,i)=>o[h]=r[i]||'');
+    o.m2cub=+o.m2cub||0;o.m2semi=+o.m2semi||0;o.m2desc=+o.m2desc||0;
+    o.factor=+o.factor||0.5;o.costoTotal=+o.costoTotal||0;o.precioVenta=+o.precioVenta||0;
+    return o;
+  });
+}
+
+async function sheetAppend(p){
+  const row=HEADERS.map(h=>p[h]??'');
+  await fetch(`${sheetsBase}/values/${SHEET_TAB}!A1:AA:append?valueInputOption=USER_ENTERED`,{
+    method:'POST',headers:authH(),
+    body:JSON.stringify({values:[row]})
+  });
+}
+
+async function sheetUpdate(p){
+  // find row by id
+  const all=await sheetRead();
+  const idx=all.findIndex(x=>x.id===p.id);
+  if(idx<0)return sheetAppend(p);
+  const rowNum=idx+2; // +1 header +1 1-based
+  const row=HEADERS.map(h=>p[h]??'');
+  await fetch(`${sheetsBase}/values/${SHEET_TAB}!A${rowNum}:AA${rowNum}?valueInputOption=USER_ENTERED`,{
+    method:'PUT',headers:authH(),
+    body:JSON.stringify({values:[row]})
+  });
+}
+
+async function sheetDelete(id){
+  const all=await sheetRead();
+  const idx=all.findIndex(x=>x.id===id);
+  if(idx<0)return;
+  const rowNum=idx+2;
+  // get spreadsheet metadata for sheet gid
+  const meta=await fetch(`${sheetsBase}?fields=sheets.properties`,{headers:authH()});
+  const md=await meta.json();
+  const sheetGid=md.sheets.find(s=>s.properties.title===SHEET_TAB)?.properties.sheetId||0;
+  await fetch(`${sheetsBase}:batchUpdate`,{
+    method:'POST',headers:authH(),
+    body:JSON.stringify({requests:[{deleteDimension:{range:{sheetId:sheetGid,dimension:'ROWS',startIndex:rowNum-1,endIndex:rowNum}}}]})
+  });
+}
+
+async function loadProjects(){
+  showLoad(true);
+  try{
+    projects=await sheetRead();
+    syncStatus='ok';
+  }catch(e){
+    syncStatus='err';
+    console.error(e);
+  }
+  showLoad(false);
+}
+
+async function saveProject(p,isNew){
+  syncStatus='sync';updateSyncBar();
+  try{
+    if(isNew)await sheetAppend(p);else await sheetUpdate(p);
+    await loadProjects();
+    syncStatus='ok';
+  }catch(e){syncStatus='err';console.error(e);}
+  updateSyncBar();
+}
+
+async function deleteProject(id){
+  syncStatus='sync';updateSyncBar();
+  try{
+    await sheetDelete(id);
+    await loadProjects();
+    syncStatus='ok';
+  }catch(e){syncStatus='err';console.error(e);}
+  updateSyncBar();
+}
+
+function updateSyncBar(){
+  const el=document.getElementById('sync-dot');
+  const tx=document.getElementById('sync-txt');
+  if(!el)return;
+  el.className='sync-dot'+(syncStatus==='err'?' err':syncStatus==='sync'?' sync':'');
+  tx.textContent=syncStatus==='ok'?'Sincronizado con Google Sheets':syncStatus==='sync'?'Guardando…':'Error de conexión';
+}
+
+// ─── OAUTH ────────────────────────────────────────────────────────────────
+function initGoogleAuth(){
+  const client=google.accounts.oauth2.initTokenClient({
+    client_id:CLIENT_ID,
+    scope:SCOPES,
+    callback:async(resp)=>{
+      if(resp.error){
+        document.getElementById('auth-err').style.display='block';
+        return;
+      }
+      accessToken=resp.access_token;
+      document.getElementById('auth-screen').style.display='none';
+      document.getElementById('main-app').style.display='block';
+      await loadProjects();
+      render();
+    }
+  });
+
+  google.accounts.id.initialize({
+    client_id:CLIENT_ID,
+    callback:()=>client.requestAccessToken()
+  });
+
+  google.accounts.id.renderButton(
+    document.getElementById('g-signin-btn'),
+    {theme:'outline',size:'large',text:'signin_with',locale:'es',width:280}
+  );
+}
+
+window.addEventListener('load',()=>{
+  const wait=setInterval(()=>{
+    if(window.google?.accounts){
+      clearInterval(wait);
+      initGoogleAuth();
+    }
+  },100);
+});
+
+// ─── FILTER LOGIC ─────────────────────────────────────────────────────────
+const colVal=(p,k)=>{
+  if(k==='proyecto')return p.proyecto;
+  if(k==='estado')return p.estado;
+  if(k==='m2cub')return p.m2cub?fnum(p.m2cub):'-';
+  if(k==='m2h')return hom(p)?fnum(hom(p)):'-';
+  if(k==='cm2')return fcm2(cm2(p));
+  if(k==='costo')return fmoney(p.costoTotal,p.moneda,true);
+  if(k==='venta')return fmoney(p.precioVenta,p.moneda,true);
+  if(k==='ren')return p.costoTotal&&p.precioVenta?fpct(ren(p)):'-';
+  return '';
+};
+
+const baseRows=()=>{
+  let r=[...projects];
+  if(q){const lq=q.toLowerCase();r=r.filter(p=>(p.proyecto+p.desarrollador+p.barrio+p.estado).toLowerCase().includes(lq));}
+  if(kpiFilt){
+    if(kpiFilt.t==='estado')r=r.filter(p=>p.estado===kpiFilt.v);
+    else if(kpiFilt.t==='barrio')r=r.filter(p=>p.barrio===kpiFilt.v);
+    else if(kpiFilt.t==='tipo')r=r.filter(p=>p.tipo===kpiFilt.v);
+  }
+  return r;
+};
+const withCF=rows=>{
+  let r=[...rows];
+  Object.entries(CF).forEach(([k,s])=>{if(s&&s.size>0)r=r.filter(p=>s.has(colVal(p,k)))});
+  return r;
+};
+const sorted=rows=>{
+  const r=[...rows];
+  r.sort((a,b)=>{
+    let av,bv;
+    if(sortCol==='m2h'){av=hom(a);bv=hom(b);}
+    else if(sortCol==='cm2'){av=cm2(a);bv=cm2(b);}
+    else if(sortCol==='ren'){av=ren(a);bv=ren(b);}
+    else if(sortCol==='m2cub'){av=+a.m2cub||0;bv=+b.m2cub||0;}
+    else if(sortCol==='costo'){av=+a.costoTotal||0;bv=+b.costoTotal||0;}
+    else if(sortCol==='venta'){av=+a.precioVenta||0;bv=+b.precioVenta||0;}
+    else{av=a[sortCol]||'';bv=b[sortCol]||'';}
+    if(typeof av==='number'&&typeof bv==='number')return(av-bv)*sortDir;
+    return String(av).localeCompare(String(bv))*sortDir;
+  });
+  return r;
+};
+const uniq=col=>{
+  const base=baseRows();
+  let r=base;
+  Object.entries(CF).filter(([k])=>k!==col).forEach(([k,s])=>{if(s&&s.size>0)r=r.filter(p=>s.has(colVal(p,k)))});
+  return[...new Set(r.map(p=>colVal(p,col)))].sort();
+};
+
+// ─── KPI DATA ─────────────────────────────────────────────────────────────
+const kd=()=>{
+  const ac=projects.filter(p=>p.estado!=='Descartado');
+  const rs=ac.filter(p=>+p.costoTotal&&+p.precioVenta).map(p=>ren(p));
+  const avg=rs.length?rs.reduce((a,b)=>a+b,0)/rs.length:0;
+  const byE={};projects.forEach(p=>{byE[p.estado]=(byE[p.estado]||0)+1});
+  const byB={};ac.forEach(p=>{if(p.barrio)byB[p.barrio]=(byB[p.barrio]||0)+1});
+  const byT={};
+  ac.filter(p=>+p.costoTotal&&hom(p)>0).forEach(p=>{
+    if(!byT[p.tipo])byT[p.tipo]={s:0,n:0};
+    byT[p.tipo].s+=cm2(p);byT[p.tipo].n++;
+  });
+  const cbt={};Object.entries(byT).forEach(([k,v])=>cbt[k]=v.s/v.n);
+  return{avg,byE,byB,cbt,total:projects.length,ac:ac.length};
+};
+
+// ─── CHARTS ───────────────────────────────────────────────────────────────
+let CH={};
+const renderCharts=d=>{
+  ['cB','cT'].forEach(id=>{const e=Chart.getChart(id);if(e)e.destroy()});
+  const bl=Object.keys(d.byB),bv=Object.values(d.byB);
+  const hw=Math.max(100,bl.length*30+50);
+  const wb=document.getElementById('wrap-cB');if(wb)wb.style.height=hw+'px';
+  const cb=document.getElementById('cB');
+  if(cb)CH.b=new Chart(cb,{type:'bar',data:{labels:bl,datasets:[{data:bv,backgroundColor:'#B5D4F4',borderColor:'#378ADD',borderWidth:1}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,onClick(e,els){if(els.length){kpiFilt={t:'barrio',v:bl[els[0].index]};page=1;render()}},plugins:{legend:{display:false},tooltip:{callbacks:{label:i=>`${i.raw} proy.`}}},scales:{x:{ticks:{stepSize:1,font:{size:10}},grid:{color:'rgba(0,0,0,.05)'}},y:{ticks:{font:{size:10}}}}}});
+  const tl=Object.keys(d.cbt),tv=Object.values(d.cbt);
+  const ct=document.getElementById('cT');
+  if(ct)CH.t=new Chart(ct,{type:'bar',data:{labels:tl,datasets:[{data:tv.map(v=>Math.round(v)),backgroundColor:'#C0DD97',borderColor:'#639922',borderWidth:1}]},options:{responsive:true,maintainAspectRatio:false,onClick(e,els){if(els.length){kpiFilt={t:'tipo',v:tl[els[0].index]};page=1;render()}},plugins:{legend:{display:false},tooltip:{callbacks:{label:i=>`$${Math.round(i.raw).toLocaleString('es-AR')}/m²`}}},scales:{x:{ticks:{font:{size:10},maxRotation:35}},y:{ticks:{font:{size:10},callback:v=>'$'+Math.round(v/1000)+'k'},grid:{color:'rgba(0,0,0,.05)'}}}}});
+};
+
+// ─── DD HELPERS ───────────────────────────────────────────────────────────
+const ddHTML=col=>{
+  const vals=uniq(col);
+  PF[col]=PF[col]||new Set(CF[col]&&CF[col].size>0?CF[col]:vals);
+  const pend=PF[col];
+  const allOn=vals.every(v=>pend.has(v));
+  return`<div class="dd" id="dd-${col}" onclick="event.stopPropagation()">
+    <div class="dd-search"><input type="text" placeholder="Buscar…" oninput="ddSearch('${col}',this.value)"></div>
+    <div class="dd-list" id="ddl-${col}">
+      <div class="dd-row" onclick="ddAll('${col}')"><input type="checkbox" id="dda-${col}" ${allOn?'checked':''} onclick="event.stopPropagation();ddAll('${col}')"><span style="font-weight:600">(Todos)</span></div>
+      ${vals.map(v=>`<div class="dd-row" onclick="ddTog('${col}','${v.replace(/'/g,"\\'")}')"><input type="checkbox" data-v="${v}" ${pend.has(v)?'checked':''} onclick="event.stopPropagation();ddTog('${col}','${v.replace(/'/g,"\\'")}')"><span>${v}</span></div>`).join('')}
+    </div>
+    <div class="dd-foot">
+      <button class="btn btn-sm" onclick="ddClear('${col}')">Limpiar</button>
+      <button class="btn btn-sm btn-primary" onclick="ddApply('${col}')">Aplicar</button>
+    </div>
+  </div>`;
+};
+const ddRefresh=col=>{
+  const vals=uniq(col);const pend=PF[col]||new Set(vals);
+  const ac=document.getElementById('dda-'+col);if(ac)ac.checked=vals.every(v=>pend.has(v));
+  document.querySelectorAll(`#ddl-${col} [data-v]`).forEach(cb=>{cb.checked=pend.has(cb.dataset.v)});
+};
+window.ddAll=col=>{const vals=uniq(col);if(!PF[col])PF[col]=new Set(vals);const p=PF[col];vals.every(v=>p.has(v))?p.clear():vals.forEach(v=>p.add(v));ddRefresh(col)};
+window.ddTog=(col,v)=>{const vals=uniq(col);if(!PF[col])PF[col]=new Set(vals);const p=PF[col];p.has(v)?p.delete(v):p.add(v);ddRefresh(col)};
+window.ddSearch=(col,s)=>{document.querySelectorAll(`#ddl-${col} .dd-row:not(:first-child)`).forEach(r=>{r.style.display=r.querySelector('span')?.textContent?.toLowerCase().includes(s.toLowerCase())?'':'none'})};
+window.ddApply=col=>{const vals=uniq(col);const p=PF[col]||new Set(vals);vals.every(v=>p.has(v))?delete CF[col]:CF[col]=new Set(p);openDD=null;page=1;render()};
+window.ddClear=col=>{delete CF[col];delete PF[col];openDD=null;page=1;render()};
+
+const thHTML=(col,label,w,num)=>{
+  const isSort=sortCol===col,hasFilt=CF[col]&&CF[col].size>0,isOpen=openDD===col;
+  return`<th style="width:${w}" class="${num?'th-num':''}">
+    <button class="th-btn${isSort?' sorted':''}" data-col="${col}">
+      <span style="overflow:hidden;text-overflow:ellipsis">${label}${hasFilt?' 🔹':''}</span>
+      <span class="th-sort">${isSort?(sortDir===1?'↑':'↓'):'⇅'}</span>
+    </button>
+    ${isOpen?ddHTML(col):''}
+  </th>`;
+};
+
+// ─── RENDER ───────────────────────────────────────────────────────────────
+const COLS=[
+  {k:'proyecto',l:'Proyecto',w:'21%'},
+  {k:'estado',l:'Estado',w:'10%'},
+  {k:'m2cub',l:'m² cub.',w:'7%',num:true},
+  {k:'m2h',l:'m² hom.',w:'7%',num:true},
+  {k:'cm2',l:'$/m²',w:'9%',num:true},
+  {k:'costo',l:'Costo total',w:'11%',num:true},
+  {k:'venta',l:'Precio venta',w:'11%',num:true},
+  {k:'ren',l:'Rentab.',w:'7%',num:true},
+];
+
+const render=()=>{
+  const d=kd();
+  const base=baseRows(),filt=withCF(base),srt=sorted(filt);
+  const total=srt.length,pages=Math.max(1,Math.ceil(total/PER));
+  if(page>pages)page=pages;
+  const pr=srt.slice((page-1)*PER,page*PER);
+  const activeCF=Object.values(CF).filter(s=>s&&s.size>0).length;
+
+  document.getElementById('app').innerHTML=`
+<div class="topbar">
+  <div>
+    <div class="app-title">🏢 Inversiones inmobiliarias</div>
+    <div class="app-sub">${projects.length} proyectos · ${d.ac} activos</div>
+  </div>
+  <div style="display:flex;gap:.4rem;align-items:center;flex-wrap:wrap">
+    <div class="sync-bar"><span class="sync-dot" id="sync-dot"></span><span id="sync-txt">Sincronizado</span></div>
+    <button class="btn" id="bRef" title="Recargar datos">↻ Recargar</button>
+    <button class="btn" id="bCfg">⚙ Listas</button>
+    <button class="btn btn-primary" id="bNew">+ Nuevo proyecto</button>
+  </div>
+</div>
+
+<div class="kpi-row">
+  <div class="kpi" id="kAll"><div class="kpi-label">Total proyectos</div><div class="kpi-val">${d.total}</div><div class="kpi-sub">${d.ac} activos</div></div>
+  <div class="kpi" id="kAna"><div class="kpi-label">En análisis</div><div class="kpi-val">${d.byE['En análisis']||0}</div><div class="kpi-sub">+${d.byE['Interesado']||0} interesado${(d.byE['Interesado']||0)!==1?'s':''}</div></div>
+  <div class="kpi" id="kCom"><div class="kpi-label">Comprometidos</div><div class="kpi-val">${d.byE['Comprometido']||0}</div><div class="kpi-sub">${d.byE['Cerrado']||0} cerrado${(d.byE['Cerrado']||0)!==1?'s':''}</div></div>
+  <div class="kpi" id="kRen"><div class="kpi-label">Rentab. promedio</div><div class="kpi-val" style="color:${d.avg>=0?'#3B6D11':'#A32D2D'}">${fpct(d.avg)}</div><div class="kpi-sub">proyectos con datos</div></div>
+</div>
+
+<div class="charts-row">
+  <div class="chart-card">
+    <div class="chart-label">Proyectos por barrio · click para filtrar</div>
+    <div id="wrap-cB" style="position:relative;width:100%;height:100px"><canvas id="cB" role="img" aria-label="Proyectos por barrio"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-label">Costo/m² promedio por tipo · click para filtrar</div>
+    <div style="position:relative;width:100%;height:100px"><canvas id="cT" role="img" aria-label="Costo por m2 por tipo"></canvas></div>
+  </div>
+</div>
+
+<div class="toolbar">
+  <div class="search-box">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" placeholder="Buscar proyecto, desarrollador, barrio…" id="bSearch" value="${q}">
+  </div>
+  ${kpiFilt?`<span class="chip">📍 ${kpiFilt.v}<span class="x" id="xKpi"> ×</span></span>`:''}
+  ${activeCF?`<span class="chip">🔹 ${activeCF} filtro${activeCF>1?'s':''}<span class="x" id="xCF"> ×</span></span>`:''}
+  <span class="rcount" style="margin-left:auto">${total} resultado${total!==1?'s':''}</span>
+  <div class="view-toggle">
+    <button class="vbtn${view==='summary'?' on':''}" id="vSum">Resumida</button>
+    <button class="vbtn${view==='full'?' on':''}" id="vFull">Completa</button>
+  </div>
+</div>
+
+${view==='summary'?`
+<div class="tbl-outer" style="position:relative">
+<table>
+<thead><tr>
+  <th style="width:3%"><div style="padding:.4rem .45rem;font-size:10px;color:#b4b2a9">#</div></th>
+  ${COLS.map(c=>thHTML(c.k,c.l,c.w,c.num)).join('')}
+  <th style="width:6%;text-align:center"><div style="padding:.4rem .45rem;font-size:10px">Acc.</div></th>
+</tr></thead>
+<tbody>
+${pr.length===0?`<tr><td colspan="10" class="tbl-empty">Sin resultados para los filtros aplicados</td></tr>`:''}
+${pr.map((p,i)=>{
+  const r=ren(p),rn=(page-1)*PER+i+1;
+  const monLbl=p.moneda==='ARS'?'<span style="font-size:9px;color:#b4b2a9;margin-left:2px">ARS</span>':'';
+  return`<tr data-id="${p.id}" title="1 click: ver detalle · 2 clicks: editar">
+    <td style="color:#b4b2a9;font-size:10px">${rn}</td>
+    <td title="${p.proyecto} — ${p.desarrollador}"><strong>${p.proyecto}</strong><br><span style="font-size:10px;color:#b4b2a9">${p.desarrollador}</span></td>
+    <td><span class="badge ${bmap[p.estado]||''}">${p.estado}</span></td>
+    <td class="td-r">${p.m2cub?fnum(p.m2cub):'-'}</td>
+    <td class="td-r">${fnum(hom(p))}</td>
+    <td class="td-r">${fcm2(cm2(p))}</td>
+    <td class="td-r">${fmoney(p.costoTotal,p.moneda,true)}${monLbl}</td>
+    <td class="td-r">${fmoney(p.precioVenta,p.moneda,true)}${monLbl}</td>
+    <td class="td-r ${r>0?'rp':r<0?'rn':''}">${p.costoTotal&&p.precioVenta?fpct(r):'-'}</td>
+    <td style="text-align:center;white-space:nowrap">
+      <button class="btn btn-sm" data-act="det" data-id="${p.id}" title="Ver detalle">👁</button>
+      <button class="btn btn-sm" data-act="ed" data-id="${p.id}" title="Editar">✏️</button>
+    </td>
+  </tr>`;}).join('')}
+</tbody>
+</table>
+</div>
+${pages>1?`<div class="pager"><span>${total} · pág. ${page}/${pages}</span>${Array.from({length:pages},(_,i)=>`<button class="pg${page===i+1?' on':''}" data-pg="${i+1}">${i+1}</button>`).join('')}</div>`:''}
+`:renderFull(srt)}`;
+
+  requestAnimationFrame(()=>renderCharts(d));
+  updateSyncBar();
+  bindMain();
+};
+
+const renderFull=rows=>{
+  const FC=[
+    {k:'proyecto',l:'Proyecto'},{k:'estado',l:'Estado'},{k:'tipo',l:'Tipo'},{k:'destino',l:'Destino'},
+    {k:'fechaConsulta',l:'Consulta'},{k:'fechaFin',l:'Fin est.'},{k:'m2cub',l:'m²cub',n:true},
+    {k:'_m2h',l:'m²hom',n:true},{k:'moneda',l:'Mon.'},{k:'costoTotal',l:'Costo',n:true},
+    {k:'precioVenta',l:'Venta',n:true},{k:'_cm2',l:'$/m²',n:true},{k:'_ren',l:'Rent.',n:true},
+    {k:'formaPago',l:'Pago'},{k:'estructura',l:'Estructura'},{k:'barrio',l:'Barrio'},{k:'docOK',l:'Doc'},{k:'obs',l:'Obs.'},
+  ];
+  const cv=(p,c)=>{
+    if(c.k==='estado')return`<span class="badge ${bmap[p.estado]||''}">${p.estado}</span>`;
+    if(c.k==='_m2h')return fnum(hom(p));
+    if(c.k==='_cm2')return fcm2(cm2(p));
+    if(c.k==='_ren'){const r=ren(p);return`<span class="${r>0?'rp':r<0?'rn':''}">${p.costoTotal&&p.precioVenta?fpct(r):'-'}</span>`;}
+    if(c.k==='costoTotal')return fmoney(p.costoTotal,p.moneda,true);
+    if(c.k==='precioVenta')return fmoney(p.precioVenta,p.moneda,true);
+    if(c.k==='obs')return`<span title="${p.obs||''}" style="max-width:90px;display:block;overflow:hidden;text-overflow:ellipsis">${p.obs||'-'}</span>`;
+    if(c.n)return p[c.k]?fnum(+p[c.k]):'-';
+    return p[c.k]||'-';
+  };
+  return`<div style="overflow-x:auto;background:#fff;border:var(--border);border-radius:var(--rl)">
+    <table style="font-size:11px;min-width:1300px">
+      <thead style="background:#f8f7f4"><tr>
+        <th><div style="padding:.38rem .45rem;font-size:10px;color:#b4b2a9">#</div></th>
+        ${FC.map(c=>`<th class="${c.n?'th-num':''}"><div style="padding:.38rem .45rem;white-space:nowrap;font-size:10px">${c.l}</div></th>`).join('')}
+        <th style="text-align:center"><div style="padding:.38rem .45rem;font-size:10px">Acc.</div></th>
+      </tr></thead>
+      <tbody>
+        ${rows.length===0?`<tr><td colspan="${FC.length+2}" class="tbl-empty">Sin resultados</td></tr>`:''}
+        ${rows.map((p,i)=>`<tr data-id="${p.id}" title="1 click: detalle · 2 clicks: editar">
+          <td style="color:#b4b2a9">${i+1}</td>
+          ${FC.map(c=>`<td class="${c.n?'td-r':''}">${cv(p,c)}</td>`).join('')}
+          <td style="text-align:center;white-space:nowrap">
+            <button class="btn btn-sm" data-act="det" data-id="${p.id}">👁</button>
+            <button class="btn btn-sm" data-act="ed" data-id="${p.id}">✏️</button>
+          </td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`;
+};
+
+function bindMain(){
+  document.getElementById('bSearch')?.addEventListener('input',e=>{q=e.target.value;page=1;render()});
+  document.getElementById('xKpi')?.addEventListener('click',()=>{kpiFilt=null;page=1;render()});
+  document.getElementById('xCF')?.addEventListener('click',()=>{CF={};PF={};page=1;render()});
+  document.getElementById('bNew')?.addEventListener('click',()=>openForm(null));
+  document.getElementById('bCfg')?.addEventListener('click',renderCfg);
+  document.getElementById('bRef')?.addEventListener('click',async()=>{await loadProjects();render()});
+  document.getElementById('vSum')?.addEventListener('click',()=>{view='summary';render()});
+  document.getElementById('vFull')?.addEventListener('click',()=>{view='full';render()});
+  document.getElementById('kAna')?.addEventListener('click',()=>{kpiFilt={t:'estado',v:'En análisis'};page=1;render()});
+  document.getElementById('kCom')?.addEventListener('click',()=>{kpiFilt={t:'estado',v:'Comprometido'};page=1;render()});
+  document.getElementById('kAll')?.addEventListener('click',()=>{kpiFilt=null;page=1;render()});
+  document.querySelectorAll('[data-act="det"]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();openDet(b.dataset.id)}));
+  document.querySelectorAll('[data-act="ed"]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();openForm(b.dataset.id)}));
+  document.querySelectorAll('[data-pg]').forEach(b=>b.addEventListener('click',()=>{page=parseInt(b.dataset.pg);render()}));
+  document.querySelectorAll('.th-btn').forEach(btn=>btn.addEventListener('click',e=>{
+    if(e.target.closest('.dd'))return;
+    const col=btn.dataset.col;
+    const vals=uniq(col);
+    PF[col]=CF[col]&&CF[col].size>0?new Set(CF[col]):new Set(vals);
+    openDD=openDD===col?null:col;
+    render();
+  }));
+  let dbl=null;
+  document.querySelectorAll('tr[data-id]').forEach(tr=>{
+    tr.addEventListener('click',e=>{
+      if(e.target.closest('button'))return;
+      if(dbl){clearTimeout(dbl);dbl=null;openForm(tr.dataset.id);return;}
+      dbl=setTimeout(()=>{dbl=null;openDet(tr.dataset.id)},260);
+    });
+  });
+  document.addEventListener('click',e=>{
+    if(openDD&&!e.target.closest('#dd-'+openDD)&&!e.target.closest('.th-btn')){openDD=null;render();}
+  },{once:true});
+}
+
+// ─── FORM ─────────────────────────────────────────────────────────────────
+const openForm=id=>{
+  const blank={id:uid(),proyecto:'',desarrollador:'',contacto:'',tel:'',estado:'En análisis',fechaConsulta:'',fechaFin:'',fechaReal:'',tipo:'',destino:'',m2cub:'',m2semi:'',m2desc:'',factor:0.5,moneda:'USD',ajuste:'',costoTotal:'',precioVenta:'',formaPago:'',estructura:'',web:'',provincia:'',barrio:'',direccion:'',docOK:'',obs:''};
+  const p=id?projects.find(x=>x.id===id):blank;
+  const isNew=!id;
+  const sel=(k,v,fid)=>`<select id="${fid}">${L[k].filter(x=>!DIS[k].has(x)).map(x=>`<option${x===v?' selected':''}>${x}</option>`).join('')}</select>`;
+  const h=hom(p),c=cm2(p),r=ren(p);
+  document.getElementById('app').innerHTML=`
+<div class="topbar">
+  <button class="btn" id="bBack">← Volver</button>
+  <div class="app-title" style="font-size:15px">${isNew?'Nuevo proyecto':'Editar: '+p.proyecto}</div>
+  <div></div>
+</div>
+<div class="page-wrap">
+<div class="fg">
+  <div class="fdiv">Identificación</div>
+  <div class="fi"><label class="fl">Proyecto *</label><input id="fp" value="${p.proyecto}"></div>
+  <div class="fi"><label class="fl">Desarrollador</label><input id="fd" value="${p.desarrollador}"></div>
+  <div class="fi"><label class="fl">Contacto</label><input id="fc" value="${p.contacto}"></div>
+  <div class="fi"><label class="fl">Teléfono / mail</label><input id="ft" value="${p.tel}"></div>
+  <div class="fi"><label class="fl">Estado</label>${sel('estado',p.estado,'fe')}</div>
+  <div class="fi"><label class="fl">Destino</label>${sel('destino',p.destino,'fde')}</div>
+  <div class="fdiv">Fechas &amp; tipo</div>
+  <div class="fi"><label class="fl">Fecha consulta</label><input type="date" id="ffc" value="${p.fechaConsulta}"></div>
+  <div class="fi"><label class="fl">Fecha fin estimada</label><input type="date" id="fff" value="${p.fechaFin}"></div>
+  <div class="fi"><label class="fl">Fecha entrega real</label><input type="date" id="ffr" value="${p.fechaReal}"></div>
+  <div class="fi"><label class="fl">Tipo de proyecto</label>${sel('tipo',p.tipo,'fti')}</div>
+  <div class="fdiv">Superficies (m²)</div>
+  <div class="fi"><label class="fl">m² cubiertos</label><input type="number" id="fmc" value="${p.m2cub}" min="0"></div>
+  <div class="fi"><label class="fl">m² semi cubiertos</label><input type="number" id="fms" value="${p.m2semi}" min="0"></div>
+  <div class="fi"><label class="fl">m² descubiertos</label><input type="number" id="fmd" value="${p.m2desc}" min="0"></div>
+  <div class="fi"><label class="fl">Factor homog. (def. 0.5)</label><input type="number" id="ff" value="${p.factor}" step=".05" min="0" max="1"></div>
+  <div class="fi"><label class="fl">m² homogeneizados</label><div class="fcalc" id="ch">${h?fnum(h):'-'}</div></div>
+  <div class="fdiv">Financiero</div>
+  <div class="fi"><label class="fl">Moneda</label>${sel('moneda',p.moneda,'fmo')}</div>
+  <div class="fi"><label class="fl">Ajuste de precio</label>${sel('ajuste',p.ajuste,'faj')}</div>
+  <div class="fi"><label class="fl">Costo total</label><input type="number" id="fct" value="${p.costoTotal}" min="0"></div>
+  <div class="fi"><label class="fl">Precio venta estimado</label><input type="number" id="fpv" value="${p.precioVenta}" min="0"></div>
+  <div class="fi"><label class="fl">Costo / m²</label><div class="fcalc" id="cc">${c?'$'+Math.round(c).toLocaleString('es-AR'):'-'}</div></div>
+  <div class="fi"><label class="fl">Rentabilidad estimada</label><div class="fcalc" id="cr" style="color:${r>0?'#3B6D11':r<0?'#A32D2D':'inherit'}">${p.costoTotal&&p.precioVenta?fpct(r):'-'}</div></div>
+  <div class="fdiv">Comercial</div>
+  <div class="fi"><label class="fl">Forma de pago</label>${sel('pago',p.formaPago,'fpa')}</div>
+  <div class="fi"><label class="fl">Estructura legal</label>${sel('estructura',p.estructura,'fes')}</div>
+  <div class="fi ff"><label class="fl">Publicación web</label><input id="fw" value="${p.web}" placeholder="https://…"></div>
+  <div class="fdiv">Ubicación</div>
+  <div class="fi"><label class="fl">Provincia</label>${sel('provincia',p.provincia,'fpr')}</div>
+  <div class="fi"><label class="fl">Barrio / Localidad</label><input id="fb" value="${p.barrio}"></div>
+  <div class="fi ff"><label class="fl">Dirección</label><input id="fdir" value="${p.direccion}"></div>
+  <div class="fdiv">Gestión</div>
+  <div class="fi"><label class="fl">Documentación OK</label><select id="fdo"><option value="">-</option><option${p.docOK==='Sí'?' selected':''}>Sí</option><option${p.docOK==='No'?' selected':''}>No</option><option${p.docOK==='Parcial'?' selected':''}>Parcial</option></select></div>
+  <div class="fi ff"><label class="fl">Observaciones</label><textarea id="fo">${p.obs||''}</textarea></div>
+</div>
+<div style="display:flex;justify-content:flex-end;gap:.4rem;margin-top:.85rem;padding-top:.65rem;border-top:var(--border)">
+  ${!isNew?`<button class="btn btn-danger" id="bDel">Eliminar proyecto</button>`:''}
+  <button class="btn" id="bCan">Cancelar</button>
+  <button class="btn btn-primary" id="bSav">Guardar proyecto</button>
+</div>
+</div>`;
+
+  const upd=()=>{
+    const t={m2cub:+document.getElementById('fmc')?.value||0,m2semi:+document.getElementById('fms')?.value||0,factor:+document.getElementById('ff')?.value||.5,costoTotal:+document.getElementById('fct')?.value||0,precioVenta:+document.getElementById('fpv')?.value||0};
+    const hv=hom(t),cv2=cm2(t),rv=ren(t);
+    const eh=document.getElementById('ch'),ec=document.getElementById('cc'),er=document.getElementById('cr');
+    if(eh)eh.textContent=hv?fnum(hv):'-';
+    if(ec)ec.textContent=cv2?'$'+Math.round(cv2).toLocaleString('es-AR'):'-';
+    if(er){er.textContent=t.costoTotal&&t.precioVenta?fpct(rv):'-';er.style.color=rv>0?'#3B6D11':rv<0?'#A32D2D':'inherit';}
+  };
+  ['fmc','fms','ff','fct','fpv'].forEach(x=>document.getElementById(x)?.addEventListener('input',upd));
+  const fv=x=>document.getElementById(x)?.value||'';
+  const fn=x=>+document.getElementById(x)?.value||0;
+  document.getElementById('bBack')?.addEventListener('click',render);
+  document.getElementById('bCan')?.addEventListener('click',render);
+  document.getElementById('bDel')?.addEventListener('click',async()=>{
+    if(!confirm('¿Eliminar este proyecto? Esta acción no se puede deshacer.'))return;
+    await deleteProject(id);render();
+  });
+  document.getElementById('bSav')?.addEventListener('click',async()=>{
+    const np={id:p.id,proyecto:fv('fp'),desarrollador:fv('fd'),contacto:fv('fc'),tel:fv('ft'),estado:fv('fe'),destino:fv('fde'),fechaConsulta:fv('ffc'),fechaFin:fv('fff'),fechaReal:fv('ffr'),tipo:fv('fti'),m2cub:fn('fmc'),m2semi:fn('fms'),m2desc:fn('fmd'),factor:fn('ff')||.5,moneda:fv('fmo'),ajuste:fv('faj'),costoTotal:fn('fct'),precioVenta:fn('fpv'),formaPago:fv('fpa'),estructura:fv('fes'),web:fv('fw'),provincia:fv('fpr'),barrio:fv('fb'),direccion:fv('fdir'),docOK:fv('fdo'),obs:fv('fo')};
+    if(!np.proyecto){alert('El nombre del proyecto es obligatorio');return;}
+    await saveProject(np,isNew);
+    render();
+  });
+};
+
+// ─── DETAIL ───────────────────────────────────────────────────────────────
+const openDet=id=>{
+  const p=projects.find(x=>x.id===id);if(!p)return;
+  const r=ren(p);
+  const row=(l,v)=>`<div class="det-row"><label>${l}</label><p>${v||'-'}</p></div>`;
+  document.getElementById('app').innerHTML=`
+<div class="topbar">
+  <button class="btn" id="bBk">← Volver</button>
+  <div style="flex:1"><div class="app-title" style="font-size:15px">${p.proyecto}</div><div class="app-sub">${p.desarrollador} · <span class="badge ${bmap[p.estado]||''}">${p.estado}</span></div></div>
+  <button class="btn btn-primary" id="bEd">✏️ Editar</button>
+</div>
+<div class="page-wrap">
+<div class="det-grid">
+  <div class="det-sec">Identificación</div>
+  ${row('Contacto',p.contacto)}${row('Tel / mail',p.tel)}${row('Tipo',p.tipo)}${row('Destino',p.destino)}
+  <div class="det-sec">Fechas</div>
+  ${row('Consulta',p.fechaConsulta)}${row('Fin estimada',p.fechaFin)}${row('Entrega real',p.fechaReal||'—')}
+  <div class="det-sec">Superficies</div>
+  ${row('m² cubiertos',fnum(p.m2cub))}${row('m² semi',fnum(p.m2semi))}${row('m² descubiertos',fnum(p.m2desc))}${row('Factor homog.',p.factor)}${row('m² homog.',fnum(hom(p)))}
+  <div class="det-sec">Financiero</div>
+  ${row('Moneda',p.moneda)}${row('Ajuste',p.ajuste)}${row('Costo total',fmoney(p.costoTotal,p.moneda,false))}${row('Precio venta est.',fmoney(p.precioVenta,p.moneda,false))}${row('Costo/m²',fcm2(cm2(p)))}<div class="det-row"><label>Rentabilidad est.</label><p style="color:${r>0?'#3B6D11':r<0?'#A32D2D':'inherit'};font-weight:600">${fpct(r)}</p></div>
+  <div class="det-sec">Comercial</div>
+  ${row('Forma de pago',p.formaPago)}${row('Estructura legal',p.estructura)}<div class="det-row" style="grid-column:1/-1">${row('Web',p.web?`<a href="${p.web}" target="_blank" style="color:var(--blue)">${p.web}</a>`:'-')}</div>
+  <div class="det-sec">Ubicación</div>
+  ${row('Provincia',p.provincia)}${row('Barrio',p.barrio)}<div class="det-row" style="grid-column:1/-1">${row('Dirección',p.direccion)}</div>
+  <div class="det-sec">Gestión</div>
+  ${row('Doc. OK',p.docOK)}<div class="det-row" style="grid-column:1/-1">${row('Observaciones',p.obs)}</div>
+</div>
+</div>`;
+  document.getElementById('bBk')?.addEventListener('click',render);
+  document.getElementById('bEd')?.addEventListener('click',()=>openForm(id));
+};
+
+// ─── CONFIG ───────────────────────────────────────────────────────────────
+const renderCfg=()=>{
+  const names={tipo:'Tipo de proyecto',estado:'Estado',destino:'Destino',moneda:'Moneda',ajuste:'Ajuste de precio',pago:'Forma de pago',estructura:'Estructura legal',provincia:'Provincia'};
+  document.getElementById('app').innerHTML=`
+<div class="topbar">
+  <button class="btn" id="bBkC">← Volver</button>
+  <div class="app-title" style="font-size:15px">Configuración de listas</div>
+  <div></div>
+</div>
+<div class="page-wrap">
+${Object.entries(names).map(([k,label])=>`
+<div class="cfg-sec">
+  <div class="cfg-title">${label}</div>
+  <div class="cfg-items">${L[k].map(v=>`<span class="cfg-item${DIS[k].has(v)?' off':''}">
+    ${v}
+    <button onclick="cfgTog('${k}','${v.replace(/'/g,"\\'")}')" title="${DIS[k].has(v)?'Habilitar':'Deshabilitar'}">${DIS[k].has(v)?'👁':'🚫'}</button>
+    <button onclick="cfgDel('${k}','${v.replace(/'/g,"\\'")}')" title="Eliminar">✕</button>
+  </span>`).join('')}</div>
+  <div class="add-row">
+    <input type="text" id="add-${k}" placeholder="Nueva opción…" maxlength="40">
+    <button class="btn btn-sm btn-primary" onclick="cfgAdd('${k}')">+ Agregar</button>
+  </div>
+</div>`).join('')}
+</div>`;
+  document.getElementById('bBkC')?.addEventListener('click',render);
+};
+window.cfgTog=(k,v)=>{DIS[k].has(v)?DIS[k].delete(v):DIS[k].add(v);renderCfg()};
+window.cfgDel=(k,v)=>{if(!confirm(`¿Eliminar "${v}"?`))return;L[k]=L[k].filter(x=>x!==v);DIS[k].delete(v);renderCfg()};
+window.cfgAdd=k=>{const inp=document.getElementById('add-'+k);const v=(inp?.value||'').trim();if(!v)return;if(!L[k].includes(v))L[k].push(v);if(inp)inp.value='';renderCfg()};
+</script>
+</body>
+</html>
