@@ -297,8 +297,10 @@ async function sheetRead(){
   return rows.slice(1).filter(r=>r[0]).map(r=>{
     const o={};
     HEADERS.forEach((h,i)=>o[h]=r[i]||'');
-    o.m2cub=+o.m2cub||0;o.m2semi=+o.m2semi||0;o.m2desc=+o.m2desc||0;
-    o.factor=+o.factor||0.5;o.costoTotal=+o.costoTotal||0;o.precioVenta=+o.precioVenta||0;
+    const toNum=v=>parseFloat(String(v||'0').replace(/\./g,'').replace(',','.'))||0;
+    const toNumDef=(v,def)=>{const n=parseFloat(String(v||'').replace(/\./g,'').replace(',','.'));return isNaN(n)?def:n;};
+    o.m2cub=toNum(o.m2cub);o.m2semi=toNum(o.m2semi);o.m2desc=toNum(o.m2desc);
+    o.factor=toNumDef(o.factor,0.5);o.costoTotal=toNum(o.costoTotal);o.precioVenta=toNum(o.precioVenta);
     return o;
   });
 }
@@ -525,7 +527,7 @@ const render=()=>{
   </div>
   <div style="display:flex;gap:.4rem;align-items:center;flex-wrap:wrap">
     <div class="sync-bar"><span class="sync-dot" id="sync-dot"></span><span id="sync-txt">Sincronizado</span><span id="last-mod" style="color:#b4b2a9;margin-left:.4rem"></span></div>
-    <span style="font-size:10px;color:#b4b2a9;padding:.28rem .5rem;background:#f8f7f4;border:.5px solid #e0ddd6;border-radius:6px">v1.2.0</span>
+    <span style="font-size:10px;color:#b4b2a9;padding:.28rem .5rem;background:#f8f7f4;border:.5px solid #e0ddd6;border-radius:6px;cursor:default" title="v1.3.0 — Fix decimales m², columnas Sheet, iconos inmueble&#10;v1.2.0 — Campos tipo inmueble y ambientes, gráfico torta&#10;v1.1.0 — Login mobile (OAuth redirect)&#10;v1.0.0 — Versión inicial">v1.3.0</span>
     <button class="btn" id="bRef">↻ Recargar</button>
     <button class="btn" id="bCfg">⚙ Listas</button>
     <button class="btn btn-primary" id="bNew">+ Nuevo proyecto</button>
