@@ -7,7 +7,7 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--blue:#185FA5;--blue-l:#E6F1FB;--blue-m:#378ADD;--green:#3B6D11;--red:#A32D2D;--red-l:#FCEBEB;--amber-l:#FAEEDA;--border:0.5px solid #e0ddd6;--r:8px;--rl:12px}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:13px;color:#1a1a18;background:#f8f7f4;min-height:100vh}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:14px;color:#1a1a18;background:#f8f7f4;min-height:100vh}
 .wrap{max-width:1280px;margin:0 auto;padding:1rem 1.5rem}
 .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;gap:.5rem;flex-wrap:wrap}
 .app-title{font-size:18px;font-weight:600;display:flex;align-items:center;gap:8px}
@@ -41,14 +41,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;fo
 .kpi{background:#fff;border:var(--border);border-radius:var(--r);padding:.6rem .85rem;cursor:pointer;transition:border-color .12s}
 .kpi:hover{border-color:#b4b2a9}
 .kpi.on{border-color:var(--blue-m)}
-.kpi-label{font-size:10px;color:#888780;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+.kpi-label{font-size:11px;color:#888780;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
 .kpi-val{font-size:20px;font-weight:600;line-height:1}
-.kpi-sub{font-size:10px;color:#b4b2a9;margin-top:3px}
+.kpi-sub{font-size:11px;color:#b4b2a9;margin-top:3px}
 
 /* Charts */
 .charts-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:.85rem}
 .chart-card{background:#fff;border:var(--border);border-radius:var(--rl);padding:.75rem}
-.chart-label{font-size:10px;font-weight:600;color:#888780;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.5rem}
+.chart-label{font-size:11px;font-weight:600;color:#888780;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.5rem}
 
 /* Toolbar */
 .toolbar{display:flex;align-items:center;gap:.4rem;margin-bottom:.5rem;flex-wrap:wrap}
@@ -68,16 +68,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;fo
 .tbl-outer{background:#fff;border:var(--border);border-radius:var(--rl);overflow:hidden}
 table{width:100%;border-collapse:collapse;table-layout:fixed}
 thead{background:#f8f7f4}
-th{padding:0;border-bottom:var(--border);font-weight:600;font-size:11px;color:#888780;white-space:nowrap;position:relative}
+th{padding:0;border-bottom:var(--border);font-weight:600;font-size:12px;color:#888780;white-space:nowrap;position:relative}
 .th-btn{display:flex;align-items:center;width:100%;padding:.4rem .5rem;cursor:pointer;gap:2px;background:none;border:none;color:inherit;font:inherit;text-align:left}
 .th-btn:hover{background:#f1efe8;color:#1a1a18}
 .th-btn.sorted{color:var(--blue)}
 .th-sort{font-size:9px;opacity:.4;flex-shrink:0;margin-left:auto}
 .th-btn.sorted .th-sort{opacity:1}
 .th-num .th-btn{flex-direction:row-reverse}
-td{padding:.35rem .5rem;border-bottom:var(--border);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+td{padding:.38rem .5rem;border-bottom:var(--border);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 tr:last-child td{border-bottom:none}
-tr[data-id]:hover td{background:#f8f7f4;cursor:pointer}
+tr[data-id]:hover td{background:#EEF5FC;cursor:pointer;transition:background .1s}
 .td-r{text-align:right;font-variant-numeric:tabular-nums}
 .badge{display:inline-block;padding:1px 6px;border-radius:99px;font-size:10px;font-weight:600}
 .ba{background:#E6F1FB;color:#0C447C}.bi{background:#EAF3DE;color:#27500A}
@@ -175,10 +175,12 @@ const L={
   ajuste:['Precio fijo','Indexado CAC','Indexado inflación','A confirmar','Libre'],
   pago:['Contado','Cuotas en pesos','Cuotas en USD','Mixto','A convenir'],
   estructura:['Fideicomiso al costo','Fideicomiso inmobiliario','Escritura directa','Boleto','A confirmar'],
-  provincia:['Buenos Aires','CABA','Córdoba','Santa Fe','Mendoza','Otro']
+  provincia:['Buenos Aires','CABA','Córdoba','Santa Fe','Mendoza','Otro'],
+  tipoInmueble:['Casa','Departamento','Departamento con cochera','PH','Cochera','Lote','Otro'],
+  ambientes:['1','2','3','4','5','6 o más']
 };
-const DIS={tipo:new Set(),estado:new Set(),destino:new Set(),moneda:new Set(),ajuste:new Set(),pago:new Set(),estructura:new Set(),provincia:new Set()};
-const HEADERS=['id','proyecto','desarrollador','contacto','tel','estado','fechaConsulta','fechaFin','fechaReal','tipo','destino','m2cub','m2semi','m2desc','factor','moneda','ajuste','costoTotal','precioVenta','formaPago','estructura','web','provincia','barrio','direccion','docOK','obs'];
+const DIS={tipo:new Set(),estado:new Set(),destino:new Set(),moneda:new Set(),ajuste:new Set(),pago:new Set(),estructura:new Set(),provincia:new Set(),tipoInmueble:new Set(),ambientes:new Set()};
+const HEADERS=['id','proyecto','desarrollador','contacto','tel','estado','fechaConsulta','fechaFin','fechaReal','tipo','destino','tipoInmueble','ambientes','m2cub','m2semi','m2desc','factor','moneda','ajuste','costoTotal','precioVenta','formaPago','estructura','web','provincia','barrio','direccion','docOK','obs'];
 
 // ─── STATE ────────────────────────────────────────────────────────────────
 let accessToken=null, projects=[], syncStatus='ok';
@@ -356,12 +358,17 @@ const updateSyncBar=()=>{
 };
 
 // ─── FILTER / SORT ────────────────────────────────────────────────────────
+const INMUEBLE_ICON={'Casa':'🏠','Departamento':'🏢','Departamento con cochera':'🏢','PH':'🏘','Cochera':'🅿️','Lote':'🌳','Otro':'📋'};
 const colVal=(p,k)=>{
   if(k==='proyecto')return p.proyecto;
   if(k==='estado')return p.estado;
+  if(k==='tipoInmueble')return p.tipoInmueble||'-';
+  if(k==='ambientes')return p.ambientes||'-';
+  if(k==='m2')return (p.m2cub?fnum(p.m2cub):'-')+' / '+(hom(p)?fnum(hom(p)):'-');
   if(k==='m2cub')return p.m2cub?fnum(p.m2cub):'-';
   if(k==='m2h')return hom(p)?fnum(hom(p)):'-';
   if(k==='cm2')return fcm2(cm2(p));
+  if(k==='costos')return fmoney(p.costoTotal,p.moneda,true)+' / '+fmoney(p.precioVenta,p.moneda,true);
   if(k==='costo')return fmoney(p.costoTotal,p.moneda,true);
   if(k==='venta')return fmoney(p.precioVenta,p.moneda,true);
   if(k==='ren')return p.costoTotal&&p.precioVenta?fpct(ren(p)):'-';
@@ -386,11 +393,11 @@ const sorted=rows=>{
   const r=[...rows];
   r.sort((a,b)=>{
     let av,bv;
-    if(sortCol==='m2h'){av=hom(a);bv=hom(b);}
+    if(sortCol==='m2'||sortCol==='m2h'){av=hom(a);bv=hom(b);}
     else if(sortCol==='cm2'){av=cm2(a);bv=cm2(b);}
     else if(sortCol==='ren'){av=ren(a);bv=ren(b);}
     else if(sortCol==='m2cub'){av=+a.m2cub||0;bv=+b.m2cub||0;}
-    else if(sortCol==='costo'){av=+a.costoTotal||0;bv=+b.costoTotal||0;}
+    else if(sortCol==='costos'||sortCol==='costo'){av=+a.costoTotal||0;bv=+b.costoTotal||0;}
     else if(sortCol==='venta'){av=+a.precioVenta||0;bv=+b.precioVenta||0;}
     else{av=a[sortCol]||'';bv=b[sortCol]||'';}
     if(typeof av==='number'&&typeof bv==='number')return(av-bv)*sortDir;
@@ -428,7 +435,8 @@ const renderCharts=d=>{
   const hw=Math.max(100,bl.length*30+50);
   const wb=document.getElementById('wrap-cB');if(wb)wb.style.height=hw+'px';
   const cb=document.getElementById('cB');
-  if(cb)new Chart(cb,{type:'bar',data:{labels:bl,datasets:[{data:bv,backgroundColor:'#B5D4F4',borderColor:'#378ADD',borderWidth:1}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,onClick(e,els){if(els.length){kpiFilt={t:'barrio',v:bl[els[0].index]};page=1;render()}},plugins:{legend:{display:false},tooltip:{callbacks:{label:i=>`${i.raw} proy.`}}},scales:{x:{ticks:{stepSize:1,font:{size:10}},grid:{color:'rgba(0,0,0,.05)'}},y:{ticks:{font:{size:10}}}}}});
+  const pieColors=['#B5D4F4','#C0DD97','#FAEEDA','#F9C6C6','#D5C6F5','#B5E8F4','#F4D6B5','#C6F5D5','#F5C6E8','#C6C6F5'];
+  if(cb)new Chart(cb,{type:'pie',data:{labels:bl,datasets:[{data:bv,backgroundColor:pieColors.slice(0,bl.length),borderWidth:1,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,onClick(e,els){if(els.length){kpiFilt={t:'barrio',v:bl[els[0].index]};page=1;render()}},plugins:{legend:{position:'right',labels:{font:{size:11},boxWidth:12,padding:8}},tooltip:{callbacks:{label:i=>`${i.label}: ${i.raw} proy.`}}}}});
   const tl=Object.keys(d.cbt),tv=Object.values(d.cbt);
   const ct=document.getElementById('cT');
   if(ct)new Chart(ct,{type:'bar',data:{labels:tl,datasets:[{data:tv.map(v=>Math.round(v)),backgroundColor:'#C0DD97',borderColor:'#639922',borderWidth:1}]},options:{responsive:true,maintainAspectRatio:false,onClick(e,els){if(els.length){kpiFilt={t:'tipo',v:tl[els[0].index]};page=1;render()}},plugins:{legend:{display:false},tooltip:{callbacks:{label:i=>`$${Math.round(i.raw).toLocaleString('es-AR')}/m²`}}},scales:{x:{ticks:{font:{size:10},maxRotation:35}},y:{ticks:{font:{size:10},callback:v=>'$'+Math.round(v/1000)+'k'},grid:{color:'rgba(0,0,0,.05)'}}}}});
@@ -475,14 +483,14 @@ const thHTML=(col,label,w,num)=>{
 
 // ─── MAIN RENDER ──────────────────────────────────────────────────────────
 const COLS=[
-  {k:'proyecto',l:'Proyecto',w:'21%'},
-  {k:'estado',l:'Estado',w:'10%'},
-  {k:'m2cub',l:'m² cub.',w:'7%',num:true},
-  {k:'m2h',l:'m² hom.',w:'7%',num:true},
-  {k:'cm2',l:'$/m²',w:'9%',num:true},
-  {k:'costo',l:'Costo total',w:'11%',num:true},
-  {k:'venta',l:'Precio venta',w:'11%',num:true},
-  {k:'ren',l:'Rentab.',w:'7%',num:true},
+  {k:'proyecto',l:'Proyecto',w:'20%'},
+  {k:'estado',l:'Estado',w:'9%'},
+  {k:'tipoInmueble',l:'Inmueble',w:'8%'},
+  {k:'ambientes',l:'Amb.',w:'5%',num:true},
+  {k:'m2',l:'m² cub./hom.',w:'9%',num:true},
+  {k:'cm2',l:'$/m²',w:'8%',num:true},
+  {k:'costos',l:'Costo / Venta',w:'13%',num:true},
+  {k:'ren',l:'Rentab.',w:'8%',num:true},
 ];
 
 const render=()=>{
@@ -517,11 +525,11 @@ const render=()=>{
 <div class="charts-row">
   <div class="chart-card">
     <div class="chart-label">Proyectos por barrio · click para filtrar</div>
-    <div id="wrap-cB" style="position:relative;width:100%;height:100px"><canvas id="cB"></canvas></div>
+    <div id="wrap-cB" style="position:relative;width:100%;height:130px"><canvas id="cB"></canvas></div>
   </div>
   <div class="chart-card">
     <div class="chart-label">Costo/m² promedio por tipo · click para filtrar</div>
-    <div style="position:relative;width:100%;height:100px"><canvas id="cT"></canvas></div>
+    <div style="position:relative;width:100%;height:130px"><canvas id="cT"></canvas></div>
   </div>
 </div>
 
@@ -552,16 +560,25 @@ ${pr.length===0?`<tr><td colspan="10" class="tbl-empty">Sin resultados para los 
 ${pr.map((p,i)=>{
   const r=ren(p),rn=(page-1)*PER+i+1;
   const monLbl=p.moneda==='ARS'?'<span style="font-size:9px;color:#b4b2a9;margin-left:2px">ARS</span>':'';
+  const renPct=p.costoTotal&&p.precioVenta?ren(p):null;
+  const renBar=renPct!==null?`<div style="margin-top:3px;height:3px;border-radius:2px;background:#e8e6e0;overflow:hidden"><div style="height:100%;width:${Math.min(Math.abs(renPct)*100,100)}%;background:${renPct>0?'#3B6D11':'#A32D2D'};border-radius:2px"></div></div>`:'';
+  const icon=INMUEBLE_ICON[p.tipoInmueble]||'';
   return`<tr data-id="${p.id}" title="1 click: ver detalle · 2 clicks: editar">
-    <td style="color:#b4b2a9;font-size:10px">${rn}</td>
-    <td title="${p.proyecto} — ${p.desarrollador}"><strong>${p.proyecto}</strong><br><span style="font-size:10px;color:#b4b2a9">${p.desarrollador}</span></td>
+    <td style="color:#b4b2a9;font-size:11px">${rn}</td>
+    <td title="${p.proyecto} — ${p.desarrollador}"><strong style="font-size:13px">${p.proyecto}</strong><br><span style="font-size:11px;color:#b4b2a9">${p.desarrollador}</span></td>
     <td><span class="badge ${bmap[p.estado]||''}">${p.estado}</span></td>
-    <td class="td-r">${p.m2cub?fnum(p.m2cub):'-'}</td>
-    <td class="td-r">${fnum(hom(p))}</td>
+    <td title="${p.tipoInmueble||''}">${icon?`<span style="font-size:14px" title="${p.tipoInmueble||''}">${icon}</span>`:`<span style="font-size:11px;color:#888780">${p.tipoInmueble||'-'}</span>`}</td>
+    <td class="td-r">${p.ambientes?`<span style="display:inline-block;padding:1px 6px;border-radius:99px;font-size:11px;font-weight:600;background:#f1efe8;color:#5F5E5A">${p.ambientes}</span>`:'-'}</td>
+    <td class="td-r" title="Cubiertos / Homogeneizados"><span style="font-size:12px">${p.m2cub?fnum(p.m2cub):'-'}</span><br><span style="font-size:11px;color:#888780">${hom(p)?fnum(hom(p)):'-'}</span></td>
     <td class="td-r">${fcm2(cm2(p))}</td>
-    <td class="td-r">${fmoney(p.costoTotal,p.moneda,true)}${monLbl}</td>
-    <td class="td-r">${fmoney(p.precioVenta,p.moneda,true)}${monLbl}</td>
-    <td class="td-r ${r>0?'rp':r<0?'rn':''}">${p.costoTotal&&p.precioVenta?fpct(r):'-'}</td>
+    <td class="td-r" title="Costo / Precio venta">
+      <span style="font-size:12px">${fmoney(p.costoTotal,p.moneda,true)}${monLbl}</span><br>
+      <span style="font-size:11px;color:#3B6D11">${p.precioVenta?fmoney(p.precioVenta,p.moneda,true)+monLbl:'-'}</span>
+    </td>
+    <td class="td-r ${renPct!==null&&renPct>0?'rp':renPct!==null&&renPct<0?'rn':''}">
+      ${renPct!==null?fpct(renPct):'-'}
+      ${renBar}
+    </td>
     <td style="text-align:center;white-space:nowrap">
       <button class="btn btn-sm" data-act="det" data-id="${p.id}">👁</button>
       <button class="btn btn-sm" data-act="ed" data-id="${p.id}">✏️</button>
@@ -580,7 +597,7 @@ ${pages>1?`<div class="pager"><span>${total} · pág. ${page}/${pages}</span>${A
 
 const renderFull=rows=>{
   const FC=[
-    {k:'proyecto',l:'Proyecto'},{k:'estado',l:'Estado'},{k:'tipo',l:'Tipo'},{k:'destino',l:'Destino'},
+    {k:'proyecto',l:'Proyecto'},{k:'estado',l:'Estado'},{k:'tipo',l:'Tipo'},{k:'destino',l:'Destino'},{k:'tipoInmueble',l:'Inmueble'},{k:'ambientes',l:'Amb.'},
     {k:'fechaConsulta',l:'Consulta'},{k:'fechaFin',l:'Fin est.'},{k:'m2cub',l:'m²cub',n:true},
     {k:'_m2h',l:'m²hom',n:true},{k:'moneda',l:'Mon.'},{k:'costoTotal',l:'Costo',n:true},
     {k:'precioVenta',l:'Venta',n:true},{k:'_cm2',l:'$/m²',n:true},{k:'_ren',l:'Rent.',n:true},
@@ -637,6 +654,12 @@ function bindMain(){
   document.querySelectorAll('.th-btn').forEach(btn=>btn.addEventListener('click',e=>{
     if(e.target.closest('.dd'))return;
     const col=btn.dataset.col;
+    // for sort-only cols (fused), just sort
+    const noFilterCols=['m2','costos'];
+    if(noFilterCols.includes(col)){
+      if(sortCol===col)sortDir*=-1;else{sortCol=col;sortDir=1;}
+      render();return;
+    }
     PF[col]=CF[col]&&CF[col].size>0?new Set(CF[col]):new Set(uniq(col));
     openDD=openDD===col?null:col;render();
   }));
@@ -655,7 +678,7 @@ function bindMain(){
 
 // ─── FORM ─────────────────────────────────────────────────────────────────
 const openForm=id=>{
-  const blank={id:uid(),proyecto:'',desarrollador:'',contacto:'',tel:'',estado:'En análisis',fechaConsulta:'',fechaFin:'',fechaReal:'',tipo:'',destino:'',m2cub:'',m2semi:'',m2desc:'',factor:0.5,moneda:'USD',ajuste:'',costoTotal:'',precioVenta:'',formaPago:'',estructura:'',web:'',provincia:'',barrio:'',direccion:'',docOK:'',obs:''};
+  const blank={id:uid(),proyecto:'',desarrollador:'',contacto:'',tel:'',estado:'En análisis',fechaConsulta:'',fechaFin:'',fechaReal:'',tipo:'',destino:'',tipoInmueble:'',ambientes:'',m2cub:'',m2semi:'',m2desc:'',factor:0.5,moneda:'USD',ajuste:'',costoTotal:'',precioVenta:'',formaPago:'',estructura:'',web:'',provincia:'',barrio:'',direccion:'',docOK:'',obs:''};
   const p=id?projects.find(x=>x.id===id):blank;
   const isNew=!id;
   const sel=(k,v,fid)=>`<select id="${fid}">${L[k].filter(x=>!DIS[k].has(x)).map(x=>`<option${x===v?' selected':''}>${x}</option>`).join('')}</select>`;
@@ -680,6 +703,8 @@ const openForm=id=>{
   <div class="fi"><label class="fl">Fecha fin estimada</label><input type="date" id="fff" value="${p.fechaFin}"></div>
   <div class="fi"><label class="fl">Fecha entrega real</label><input type="date" id="ffr" value="${p.fechaReal}"></div>
   <div class="fi"><label class="fl">Tipo de proyecto</label>${sel('tipo',p.tipo,'fti')}</div>
+  <div class="fi"><label class="fl">Tipo de inmueble</label>${sel('tipoInmueble',p.tipoInmueble,'ftin')}</div>
+  <div class="fi"><label class="fl">Ambientes</label>${sel('ambientes',p.ambientes,'famb')}</div>
   <div class="fdiv">Superficies (m²)</div>
   <div class="fi"><label class="fl">m² cubiertos</label><input type="number" id="fmc" value="${p.m2cub}" min="0"></div>
   <div class="fi"><label class="fl">m² semi cubiertos</label><input type="number" id="fms" value="${p.m2semi}" min="0"></div>
@@ -730,7 +755,7 @@ const openForm=id=>{
     showLoad(true,'Eliminando…');await deleteProject(id);showLoad(false);render();
   });
   document.getElementById('bSav')?.addEventListener('click',async()=>{
-    const np={id:p.id,proyecto:fv('fp'),desarrollador:fv('fd'),contacto:fv('fc'),tel:fv('ft'),estado:fv('fe'),destino:fv('fde'),fechaConsulta:fv('ffc'),fechaFin:fv('fff'),fechaReal:fv('ffr'),tipo:fv('fti'),m2cub:fn('fmc'),m2semi:fn('fms'),m2desc:fn('fmd'),factor:fn('ff')||.5,moneda:fv('fmo'),ajuste:fv('faj'),costoTotal:fn('fct'),precioVenta:fn('fpv'),formaPago:fv('fpa'),estructura:fv('fes'),web:fv('fw'),provincia:fv('fpr'),barrio:fv('fb'),direccion:fv('fdir'),docOK:fv('fdo'),obs:fv('fo')};
+    const np={id:p.id,proyecto:fv('fp'),desarrollador:fv('fd'),contacto:fv('fc'),tel:fv('ft'),estado:fv('fe'),destino:fv('fde'),fechaConsulta:fv('ffc'),fechaFin:fv('fff'),fechaReal:fv('ffr'),tipo:fv('fti'),tipoInmueble:fv('ftin'),ambientes:fv('famb'),m2cub:fn('fmc'),m2semi:fn('fms'),m2desc:fn('fmd'),factor:fn('ff')||.5,moneda:fv('fmo'),ajuste:fv('faj'),costoTotal:fn('fct'),precioVenta:fn('fpv'),formaPago:fv('fpa'),estructura:fv('fes'),web:fv('fw'),provincia:fv('fpr'),barrio:fv('fb'),direccion:fv('fdir'),docOK:fv('fdo'),obs:fv('fo')};
     if(!np.proyecto){alert('El nombre del proyecto es obligatorio');return;}
     showLoad(true,'Guardando…');await saveProject(np,isNew);showLoad(false);render();
   });
@@ -750,7 +775,7 @@ const openDet=id=>{
 <div class="page-wrap">
 <div class="det-grid">
   <div class="det-sec">Identificación</div>
-  ${row('Contacto',p.contacto)}${row('Tel / mail',p.tel)}${row('Tipo',p.tipo)}${row('Destino',p.destino)}
+  ${row('Contacto',p.contacto)}${row('Tel / mail',p.tel)}${row('Tipo',p.tipo)}${row('Destino',p.destino)}${row('Tipo inmueble',p.tipoInmueble)}${row('Ambientes',p.ambientes)}
   <div class="det-sec">Fechas</div>
   ${row('Consulta',p.fechaConsulta)}${row('Fin estimada',p.fechaFin)}${row('Entrega real',p.fechaReal||'—')}
   <div class="det-sec">Superficies</div>
@@ -771,7 +796,7 @@ const openDet=id=>{
 
 // ─── CONFIG LISTAS ────────────────────────────────────────────────────────
 const renderCfg=()=>{
-  const names={tipo:'Tipo de proyecto',estado:'Estado',destino:'Destino',moneda:'Moneda',ajuste:'Ajuste de precio',pago:'Forma de pago',estructura:'Estructura legal',provincia:'Provincia'};
+  const names={tipo:'Tipo de proyecto',tipoInmueble:'Tipo de inmueble',ambientes:'Ambientes',estado:'Estado',destino:'Destino',moneda:'Moneda',ajuste:'Ajuste de precio',pago:'Forma de pago',estructura:'Estructura legal',provincia:'Provincia'};
   document.getElementById('app').innerHTML=`
 <div class="topbar">
   <button class="btn" id="bBkC">← Volver</button>
