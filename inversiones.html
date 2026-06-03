@@ -164,7 +164,7 @@ const CLIENT_ID  = '260411653116-e0li9118s6dq2kfksj6v5fsrt6sd5cv8.apps.googleuse
 const SHEET_ID   = '1cU_Gd3J9Q32dDi_jfY9AbqNcNav7iYaaLxn-P2cbNNQ';
 const SHEET_TAB  = 'Proyectos';
 const SCOPES     = 'https://www.googleapis.com/auth/spreadsheets';
-const REDIRECT   = location.href.split('?')[0].split('#')[0];
+const REDIRECT   = 'https://lucasleonsanchez.github.io/inversiones/inversiones.html';
 
 // ─── LISTS ────────────────────────────────────────────────────────────────
 const L={
@@ -350,11 +350,18 @@ async function deleteProject(id){
   catch(e){syncStatus='err';console.error(e);}
   updateSyncBar();
 }
+let lastSyncTime=null;
 const updateSyncBar=()=>{
-  const dot=document.getElementById('sync-dot'),tx=document.getElementById('sync-txt');
+  const dot=document.getElementById('sync-dot'),tx=document.getElementById('sync-txt'),lm=document.getElementById('last-mod');
   if(!dot)return;
   dot.className='sync-dot'+(syncStatus==='err'?' err':syncStatus==='sync'?' sync':'');
   tx.textContent=syncStatus==='ok'?'Sincronizado':syncStatus==='sync'?'Guardando…':'Error de conexión';
+  if(syncStatus==='ok') lastSyncTime=new Date();
+  if(lm&&lastSyncTime){
+    const h=lastSyncTime.getHours().toString().padStart(2,'0');
+    const m=lastSyncTime.getMinutes().toString().padStart(2,'0');
+    lm.textContent='· '+h+':'+m;
+  }
 };
 
 // ─── FILTER / SORT ────────────────────────────────────────────────────────
@@ -508,7 +515,8 @@ const render=()=>{
     <div class="app-sub">${projects.length} proyectos · ${d.ac} activos</div>
   </div>
   <div style="display:flex;gap:.4rem;align-items:center;flex-wrap:wrap">
-    <div class="sync-bar"><span class="sync-dot" id="sync-dot"></span><span id="sync-txt">Sincronizado</span></div>
+    <div class="sync-bar"><span class="sync-dot" id="sync-dot"></span><span id="sync-txt">Sincronizado</span><span id="last-mod" style="color:#b4b2a9;margin-left:.4rem"></span></div>
+    <span style="font-size:10px;color:#b4b2a9;padding:.28rem .5rem;background:#f8f7f4;border:.5px solid #e0ddd6;border-radius:6px">v1.2.0</span>
     <button class="btn" id="bRef">↻ Recargar</button>
     <button class="btn" id="bCfg">⚙ Listas</button>
     <button class="btn btn-primary" id="bNew">+ Nuevo proyecto</button>
