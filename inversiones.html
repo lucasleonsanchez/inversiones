@@ -391,6 +391,7 @@ const baseRows=()=>{
     if(kpiFilt.t==='estado')r=r.filter(p=>p.estado===kpiFilt.v);
     else if(kpiFilt.t==='barrio')r=r.filter(p=>p.barrio===kpiFilt.v);
     else if(kpiFilt.t==='tipo')r=r.filter(p=>p.tipo===kpiFilt.v);
+    else if(kpiFilt.t==='tipoInmueble')r=r.filter(p=>p.tipoInmueble===kpiFilt.v);
   }
   return r;
 };
@@ -430,9 +431,9 @@ const kd=()=>{
   const byE={};projects.forEach(p=>{byE[p.estado]=(byE[p.estado]||0)+1});
   const byB={};ac.forEach(p=>{if(p.barrio)byB[p.barrio]=(byB[p.barrio]||0)+1});
   const byT={};
-  ac.filter(p=>+p.costoTotal&&hom(p)>0).forEach(p=>{
-    if(!byT[p.tipo])byT[p.tipo]={s:0,n:0};
-    byT[p.tipo].s+=cm2(p);byT[p.tipo].n++;
+  ac.filter(p=>+p.costoTotal&&hom(p)>0&&p.tipoInmueble).forEach(p=>{
+    if(!byT[p.tipoInmueble])byT[p.tipoInmueble]={s:0,n:0};
+    byT[p.tipoInmueble].s+=cm2(p);byT[p.tipoInmueble].n++;
   });
   const cbt={};Object.entries(byT).forEach(([k,v])=>cbt[k]=v.s/v.n);
   return{avg,byE,byB,cbt,total:projects.length,ac:ac.length};
@@ -457,7 +458,7 @@ const renderCharts=d=>{
   }
   const tl=Object.keys(d.cbt),tv=Object.values(d.cbt);
   const ct=document.getElementById('cT');
-  if(ct)new Chart(ct,{type:'bar',data:{labels:tl,datasets:[{data:tv.map(v=>Math.round(v)),backgroundColor:'#C0DD97',borderColor:'#639922',borderWidth:1}]},options:{responsive:true,maintainAspectRatio:false,onClick(e,els){if(els.length){kpiFilt={t:'tipo',v:tl[els[0].index]};page=1;render()}},plugins:{legend:{display:false},tooltip:{callbacks:{label:i=>`$${Math.round(i.raw).toLocaleString('es-AR')}/m²`}}},scales:{x:{ticks:{font:{size:10},maxRotation:35}},y:{ticks:{font:{size:10},callback:v=>'$'+Math.round(v/1000)+'k'},grid:{color:'rgba(0,0,0,.05)'}}}}});
+  if(ct)new Chart(ct,{type:'bar',data:{labels:tl,datasets:[{data:tv.map(v=>Math.round(v)),backgroundColor:'#C0DD97',borderColor:'#639922',borderWidth:1}]},options:{responsive:true,maintainAspectRatio:false,onClick(e,els){if(els.length){kpiFilt={t:'tipoInmueble',v:tl[els[0].index]};page=1;render()}},plugins:{legend:{display:false},tooltip:{callbacks:{label:i=>`$${Math.round(i.raw).toLocaleString('es-AR')}/m²`}}},scales:{x:{ticks:{font:{size:10},maxRotation:35}},y:{ticks:{font:{size:10},callback:v=>'$'+Math.round(v/1000)+'k'},grid:{color:'rgba(0,0,0,.05)'}}}}});
 };
 
 // ─── DROPDOWN ─────────────────────────────────────────────────────────────
@@ -527,7 +528,7 @@ const render=()=>{
   </div>
   <div style="display:flex;gap:.4rem;align-items:center;flex-wrap:wrap">
     <div class="sync-bar"><span class="sync-dot" id="sync-dot"></span><span id="sync-txt">Sincronizado</span><span id="last-mod" style="color:#b4b2a9;margin-left:.4rem"></span></div>
-    <span style="font-size:10px;color:#b4b2a9;padding:.28rem .5rem;background:#f8f7f4;border:.5px solid #e0ddd6;border-radius:6px;cursor:default" title="v1.5.0 — Dos factores homog. (semi y desc.), tabla m² reordenada&#10;v1.4.0 — Botón duplicar proyecto&#10;v1.3.0 — Fix decimales m², columnas Sheet, iconos inmueble&#10;v1.2.0 — Campos tipo inmueble y ambientes, gráfico torta&#10;v1.1.0 — Login mobile (OAuth redirect)&#10;v1.0.0 — Versión inicial">v1.5.0</span>
+    <span style="font-size:10px;color:#b4b2a9;padding:.28rem .5rem;background:#f8f7f4;border:.5px solid #e0ddd6;border-radius:6px;cursor:default" title="v1.6.0 — Gráfico $/m² ahora por tipo de inmueble&#10;v1.5.0 — Dos factores homog. (semi y desc.), tabla m² reordenada&#10;v1.4.0 — Botón duplicar proyecto&#10;v1.3.0 — Fix decimales m², columnas Sheet, iconos inmueble&#10;v1.2.0 — Campos tipo inmueble y ambientes, gráfico torta&#10;v1.1.0 — Login mobile (OAuth redirect)&#10;v1.0.0 — Versión inicial">v1.6.0</span>
     <button class="btn" id="bRef">↻ Recargar</button>
     <button class="btn" id="bCfg">⚙ Listas</button>
     <button class="btn btn-primary" id="bNew">+ Nuevo proyecto</button>
@@ -547,7 +548,7 @@ const render=()=>{
     <div id="wrap-cB" style="position:relative;width:100%;height:130px"><canvas id="cB"></canvas></div>
   </div>
   <div class="chart-card">
-    <div class="chart-label">Costo/m² promedio por tipo · click para filtrar</div>
+    <div class="chart-label">Costo/m² promedio por tipo de inmueble · click para filtrar</div>
     <div style="position:relative;width:100%;height:130px"><canvas id="cT"></canvas></div>
   </div>
 </div>
